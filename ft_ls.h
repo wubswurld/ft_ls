@@ -27,6 +27,7 @@ typedef struct s_ls_flags
 typedef struct s_ls
 {
     int         ls_flags;
+    int         check;
     int         ls_dir;
     char        *p_flags;
     char        **p_dir;
