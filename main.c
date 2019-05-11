@@ -2,58 +2,6 @@
 // #include "libft/libft.h"
 #include <stdio.h>
 
-int     count_flag(char **av)
-{
-    int x;
-    int y;
-    int ret;
-    
-    x = 1;
-    ret = 0;
-    while (av[x])
-    {
-        if (av[x][0] == '-')
-        {
-            y = 1;
-            while (av[x][y++])
-                ret++;
-        }
-        x++;
-    }
-    return (ret);
-}
-char      *convert_2d(char *ret, char **av) 
-{
-    int x;
-    int y;
-    int z;
-
-    x = 1;
-    y = 0;
-    while (av[x])
-    {
-        if (av[x][0] == '-')
-        {
-            z = 1;
-            //start at 2nd char of 2d array and copy it into ret[y]
-            while (av[x][z])
-                ret[y++] = av[x][z++];
-        }
-        x++;
-    }
-    return (ret);
-}
-
-char     *convert_flags(char **av, int *flags)
-{
-    char        *ret;
-    *flags = count_flag(av);
-    if (!(ret = (char *)malloc(sizeof(char) * (*flags + 1))))
-        exit(1);
-    ret = convert_2d(ret, av);
-    return (ret);
-}
-
 int     count_dir(char **av)
 {
     int x;
@@ -76,6 +24,7 @@ char    **get_dir(char **av, int *dir)
     int     x;
     int     y;
     *dir = count_dir(av);
+    //if no directory set directories to 1 for '.'
     if (*dir <= 0 && (ret = (char **)malloc(sizeof(char *) * 2)))
     {
         ret[0] = ".";
@@ -96,24 +45,25 @@ char    **get_dir(char **av, int *dir)
     ret[*dir] = NULL;
     return (ret);
 }
-
-t_ls_flags  *index_flag(t_ls *sp)
+void    check_error(char *str)
 {
-    int x;
-    t_ls_flags      *fp;
-    
-    x = 0;
-    if (!(fp = (t_ls_flags*)malloc(sizeof(t_ls_flags))))
-        exit(1);
-    while (x < sp->ls_flags)
-    {
-        if (sp->p_flags[x] == 'l')
-            fp->l_long = 1;
-        x++;    
-    }
-    return (fp);
+    printf("ls: ");
+    printf("%s: ", str);
+    printf("No such file or directory\n");
 }
 
+void    ls_print(DIR *dir, t_ls *sp, t_ls_flags *fp, int x)
+{
+    printf("lsdir = %d\n", sp->ls_dir);
+    if (!(dir = opendir(sp->p_dir[x])))
+        check_error(sp->p_dir[x]);
+    else if (sp->ls_dir > 1)
+    {
+        ft_putendl(sp->p_dir[x]);
+        printf("%s\n", sp->p_dir[x]);
+    }
+    printf("%d\n", fp->l_long);
+}
 
 void    ft_ls(t_ls *sp)
 {
@@ -124,7 +74,21 @@ void    ft_ls(t_ls *sp)
     x = 0; 
     dir = NULL;
     fp = index_flag(sp);
-    printf("%d\n", fp->l_long);
+    while (x < sp->ls_dir)
+    {
+        if (fp->R_recur == 1)
+            printf("ok");
+        else    
+            ls_print(dir, sp, fp, x);
+        x++;
+    }
+    // int y;
+    // y = 0;
+    // while (sp->p_dir[y])
+    //     free(sp->p_dir[y++]);
+    // free(sp->p_dir);
+    // free(sp->p_flags);
+    // free(fp); 
 }
 
 int     main(int ac, char **av) 
@@ -145,10 +109,13 @@ int     main(int ac, char **av)
             exit(1);
         sp->p_dir[0][0] = '.';
         sp->p_dir[1] = NULL;
+        printf("dir = .");
     }
     else
     {
+        //get flags as string
         sp->p_flags = convert_flags(av, &sp->ls_flags);
+        
         sp->p_dir = get_dir(av, &sp->ls_dir);
         printf("directory: %s\n", *sp->p_dir);
         printf("flags: %s\n", sp->p_flags);

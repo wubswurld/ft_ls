@@ -6,7 +6,7 @@ FLAGS = -Wall -Werror -Wextra
 
 GCC = gcc
 
-LIBFT = libft
+LIBFT = final-libft
 
 all: $(NAME)
 
