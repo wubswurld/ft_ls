@@ -45,24 +45,53 @@ char    **get_dir(char **av, int *dir)
     ret[*dir] = NULL;
     return (ret);
 }
-void    check_error(char *str)
-{
-    printf("ls: ");
-    printf("%s: ", str);
-    printf("No such file or directory\n");
+
+void    ls_print(char *str, t_ls_flags *fp, int x)
+{  
+	DIR		*dir;
+	char	**fol;
+	char	*tmp;
+	int		result;
+
+	result = 0;
+	dir = opendir(str);
+	fol = sort_folders(dir, fp, 0);
+	if (flags->l == 1)
+	{
+		ft_putstr("total ");
+		tmp = ft_itoa(totaldirs(fol, flags, str, result));
+		ft_putendl(tmp);
+		free(tmp);
+	}
+	while (fol[++x])
+	{
+		tmp = createpath(str, fol[x]);
+		(fol[x][0] != '.' && fp->a_hidden != 1) ? sps(fol[x], fp, tmp) : 0;
+		(fp->a_hidden == 1) ? sps(fol[i], flags, tmp) : 0;
+		free(fol[i]);
+		free(tmp);
+	}
+	closedir(dir);
+	free(fol);
 }
 
-void    ls_print(DIR *dir, t_ls *sp, t_ls_flags *fp, int x)
+void    ls_start(DIR *dir, t_ls *sp, t_ls_flags *fp, int x)
 {
-    printf("lsdir = %d\n", sp->ls_dir);
+    // printf("%s\n", sp->p_dir[x]);
     if (!(dir = opendir(sp->p_dir[x])))
-        check_error(sp->p_dir[x]);
+    {
+        printf("ls: ");
+        printf("%s: ", str);
+        printf("No such file or directory\n");    
+    }
     else if (sp->ls_dir > 1)
     {
         ft_putendl(sp->p_dir[x]);
-        printf("%s\n", sp->p_dir[x]);
     }
-    printf("%d\n", fp->l_long);
+    else 
+    {
+        ls_print(sp->p_dir[x], fp, -1);
+    }
 }
 
 void    ft_ls(t_ls *sp)
@@ -79,7 +108,7 @@ void    ft_ls(t_ls *sp)
         if (fp->R_recur == 1)
             printf("ok");
         else    
-            ls_print(dir, sp, fp, x);
+            ls_start(dir, sp, fp, x);
         x++;
     }
     // int y;
@@ -103,19 +132,19 @@ int     main(int ac, char **av)
         sp->ls_dir = 1;
         sp->ls_flags = 0;
         sp->p_flags = NULL;
+        //malloc entire 2d array
         if (!(sp->p_dir = (char **)malloc(sizeof(char*) + 1)))
             exit(1);
+        //malloc space neccessary for '.'
         if (!(sp->p_dir[0] = (char *)malloc(sizeof(char) + 1)))
             exit(1);
         sp->p_dir[0][0] = '.';
-        sp->p_dir[1] = NULL;
-        printf("dir = .");
+        sp->p_dir[1] = 0;
     }
     else
     {
         //get flags as string
         sp->p_flags = convert_flags(av, &sp->ls_flags);
-        
         sp->p_dir = get_dir(av, &sp->ls_dir);
         printf("directory: %s\n", *sp->p_dir);
         printf("flags: %s\n", sp->p_flags);
