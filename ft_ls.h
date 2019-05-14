@@ -31,11 +31,19 @@ typedef struct s_ls
     char        **p_dir;
 }               t_ls;
 
+//flags
 int     count_flag(char **av);
+//convert str into 2d array
 char      *convert_2d(char *ret, char **av);
+//convert flags into str
 char     *convert_flags(char **av, int *flags);
+//assign boolean values to each flag
 int     check_flags(t_ls *sp);
 t_ls_flags  *index_flag(t_ls *sp);
-char	**sort_folders(DIR *dir, t_flags *flags, int i);
+//error
+void    check_error(char *str);
+//directory
+int     count_dir(char **av);
+char    **get_dir(char **av, int *dir);
 
 # endif

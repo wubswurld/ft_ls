@@ -1,5 +1,25 @@
 #include "ft_ls.h"
 
+// int     count_flag(char **av)
+// {
+//     int x;
+//     int y;
+//     int ret;
+    
+//     x = 1;
+//     ret = 0;
+//     while (av[x])
+//     {
+//         if (av[x][0] == '-')
+//         {
+//             y = 1;
+//             while (av[x][y++])
+//                 ret++;
+//         }
+//         x++;
+//     }
+//     return (ret);
+// }
 int     count_flag(char **av)
 {
     int x;
@@ -13,8 +33,7 @@ int     count_flag(char **av)
         if (av[x][0] == '-')
         {
             y = 1;
-            while (av[x][y++])
-                ret++;
+            ret = ft_strlen(&av[x][y]);
         }
         x++;
     }
@@ -47,6 +66,7 @@ char     *convert_flags(char **av, int *flags)
 {
     char        *ret;
     *flags = count_flag(av);
+    printf("here = %d\n", *flags);
     if (!(ret = (char *)malloc(sizeof(char) * (*flags + 1))))
         exit(1);
     ret = convert_2d(ret, av);

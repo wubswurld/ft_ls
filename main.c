@@ -2,75 +2,45 @@
 // #include "libft/libft.h"
 #include <stdio.h>
 
-int     count_dir(char **av)
+char    **ls_sort(DIR *der, t_ls_flags *fp, int x)
 {
-    int x;
-    int ret;
+    struct dirent *d_stream;
+    char   **ret;
 
-    x = 1;
-    ret = 0;
-    while (av[x])
-    {
-        if (av[x][0] != '-')
-            ret++;
+    while ((d_stream = readdir(der)) != NULL)
         x++;
-    }
+    rewinddir(der);
+    ret = (char **)malloc(sizeof(char *) * (x + 1));
+    ret[x] = NULL;
+     while ((d_stream = readdir(der)) != NULL)
+     {
+         ret[x] = ft_strdup(d_stream->d_name);
+        x++;
+     }
+    ret[x] = NULL;
     return (ret);
+    printf("%d\n", fp->l_long);
+
 }
 
-char    **get_dir(char **av, int *dir)
-{
-    char    **ret;
-    int     x;
-    int     y;
-    *dir = count_dir(av);
-    //if no directory set directories to 1 for '.'
-    if (*dir <= 0 && (ret = (char **)malloc(sizeof(char *) * 2)))
-    {
-        ret[0] = ".";
-        ret[1] = NULL;
-        *dir = 1;
-        return (ret);
-    }
-    if (!(ret = (char **)malloc(sizeof(char) * (*dir + 1))))
-        exit(1);
-    x = 1;
-    y = 0;
-    //if their are flags or if there are no flags store the directory in ret
-    while (av[x])
-    {
-        if (av[x][0] != '-')
-            ret[y++] = ft_strdup(av[x]);
-        x++;
-    }
-    ret[*dir] = NULL;
-    return (ret);
-}
-void    check_error(char *str)
-{
-    printf("ls: ");
-    printf("%s: ", str);
-    printf("No such file or directory\n");
-}
 void    ls_basic(char *str, t_ls_flags *fp, int x)
 {
-    printf("%d\n", x);
-    printf("%d\n", fp->l_long);
-    struct dirent *d_stream;
-    DIR *der;
-   if (!(der = opendir(str)))
+    DIR *dir;
+    // char **folder;
+    char *tmp;
+    int   ret;
+
+    ret = 0;
+    tmp = NULL;
+    if (!(dir = opendir(str)))
     return;
-    while ((d_stream = readdir(der)) != NULL)
+    // folder = ls_sort(dir, fp, x);
+    if (fp->l_long == 1)
     {
-        printf("%s\n", d_stream->d_name);
+        printf("lol");
     }
-
     // Close directory stream
-    closedir(der);
-    
-
-
-
+    closedir(dir);
 }
 
 void    ls_print(DIR *dir, t_ls *sp, t_ls_flags *fp, int x)
@@ -82,11 +52,11 @@ void    ls_print(DIR *dir, t_ls *sp, t_ls_flags *fp, int x)
     else if (sp->ls_dir > 1)
     {
         ft_putendl(sp->p_dir[x]);
-        ls_basic(sp->p_dir[x], fp, 0);
+        ls_basic(sp->p_dir[x], fp, -1);
         printf("%s\n", sp->p_dir[x]);
     }
     else {
-        ls_basic(sp->p_dir[x], fp, 0);
+        ls_basic(sp->p_dir[x], fp, -1);
     }
     printf("long = %d\n", fp->l_long);
     closedir(dir);
