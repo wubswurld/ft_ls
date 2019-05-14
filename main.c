@@ -36,6 +36,7 @@ char    **get_dir(char **av, int *dir)
         exit(1);
     x = 1;
     y = 0;
+    //if their are flags or if there are no flags store the directory in ret
     while (av[x])
     {
         if (av[x][0] != '-')
@@ -51,18 +52,44 @@ void    check_error(char *str)
     printf("%s: ", str);
     printf("No such file or directory\n");
 }
+void    ls_basic(char *str, t_ls_flags *fp, int x)
+{
+    printf("%d\n", x);
+    printf("%d\n", fp->l_long);
+    struct dirent *d_stream;
+    DIR *der;
+   if (!(der = opendir(str)))
+    return;
+    while ((d_stream = readdir(der)) != NULL)
+    {
+        printf("%s\n", d_stream->d_name);
+    }
+
+    // Close directory stream
+    closedir(der);
+    
+
+
+
+}
 
 void    ls_print(DIR *dir, t_ls *sp, t_ls_flags *fp, int x)
 {
     printf("lsdir = %d\n", sp->ls_dir);
+    //open directory stream at path pointed to by sp->p_dir[x], by defauly it goes to the first entry in the directory
     if (!(dir = opendir(sp->p_dir[x])))
         check_error(sp->p_dir[x]);
     else if (sp->ls_dir > 1)
     {
         ft_putendl(sp->p_dir[x]);
+        ls_basic(sp->p_dir[x], fp, 0);
         printf("%s\n", sp->p_dir[x]);
     }
-    printf("%d\n", fp->l_long);
+    else {
+        ls_basic(sp->p_dir[x], fp, 0);
+    }
+    printf("long = %d\n", fp->l_long);
+    closedir(dir);
 }
 
 void    ft_ls(t_ls *sp)
@@ -115,7 +142,6 @@ int     main(int ac, char **av)
     {
         //get flags as string
         sp->p_flags = convert_flags(av, &sp->ls_flags);
-        
         sp->p_dir = get_dir(av, &sp->ls_dir);
         printf("directory: %s\n", *sp->p_dir);
         printf("flags: %s\n", sp->p_flags);
