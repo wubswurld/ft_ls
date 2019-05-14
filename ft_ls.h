@@ -36,5 +36,6 @@ char      *convert_2d(char *ret, char **av);
 char     *convert_flags(char **av, int *flags);
 int     check_flags(t_ls *sp);
 t_ls_flags  *index_flag(t_ls *sp);
+char	**sort_folders(DIR *dir, t_flags *flags, int i);
 
 # endif
