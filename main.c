@@ -2,31 +2,87 @@
 // #include "libft/libft.h"
 #include <stdio.h>
 
-char    **ls_sort(DIR *der, t_ls_flags *fp, int x)
+char	*createpath(char *path, char *new_path)
+{
+	char	*info;
+
+	info = (char*)malloc(sizeof(char) * (strlen(path) + strlen(new_path) + 2));
+	ft_strcpy(info, path);
+	ft_strcat(info, "/");
+	ft_strcat(info, new_path);
+	return (info);
+}
+
+int		totaldirs(char **folder, t_ls_flags *fp, char *str, int ret)
+{
+	struct stat		*filestat;
+	void			*tmp;
+	int				i;
+
+	filestat = malloc(sizeof(struct stat));
+	i = -1;
+	ret = 0;
+	while (folder[++i])
+	{
+		if (fp->a_hidden == 1 && (tmp = createpath(str, folder[i])) &&
+			(lstat(tmp, filestat)))
+		{
+			free(tmp);
+			ret += filestat->st_blocks;
+		}
+		else if (folder[i][0] != '.' && fp->a_hidden != 1 &&
+			(tmp = createpath(str, folder[i])))
+		{
+			lstat(tmp, filestat);
+			free(tmp);
+			ret += filestat->st_blocks;
+		}
+	}
+	free(filestat);
+	return (ret);
+}
+
+char	**a_order(char **ret)
+{
+	int		i;
+	char	*tmp;
+
+	i = 1;
+	while (ret[i])
+	{
+		if (ft_strcmp(ret[i - 1], ret[i]) > 0)
+		{
+			tmp = ret[i];
+			ret[i] = ret[i - 1];
+			ret[i - 1] = tmp;
+			i = 1;
+		}
+		i++;
+	}
+	return (ret);
+}
+
+char    **ls_sort(DIR *dir, t_ls_flags *fp, int x)
 {
     struct dirent *d_stream;
     char   **ret;
 
-    while ((d_stream = readdir(der)) != NULL)
+    while ((d_stream = readdir(dir)) != NULL)
         x++;
-    rewinddir(der);
+    rewinddir(dir);
     ret = (char **)malloc(sizeof(char *) * (x + 1));
     ret[x] = NULL;
-     while ((d_stream = readdir(der)) != NULL)
-     {
-         ret[x] = ft_strdup(d_stream->d_name);
-        x++;
-     }
+    while ((d_stream = readdir(dir)) != NULL)
+         ret[x++] = ft_strdup(d_stream->d_name);
     ret[x] = NULL;
+    fp->r_lex != 1 && fp->t_sort != 1 ? a_order(ret) : 0;
     return (ret);
-    printf("%d\n", fp->l_long);
-
 }
 
 void    ls_basic(char *str, t_ls_flags *fp, int x)
 {
     DIR *dir;
-    // char **folder;
+    char **folder;
     char *tmp;
     int   ret;
 
@@ -34,10 +90,13 @@ void    ls_basic(char *str, t_ls_flags *fp, int x)
     tmp = NULL;
     if (!(dir = opendir(str)))
     return;
-    // folder = ls_sort(dir, fp, x);
+    folder = ls_sort(dir, fp, x);
     if (fp->l_long == 1)
     {
-        printf("lol");
+        ft_putstr("total ");
+		printf("%s\n", ft_itoa(totaldirs(folder, fp, str, ret)));
+		// ft_putendl(tmp);
+		free(tmp);
     }
     // Close directory stream
     closedir(dir);
@@ -51,11 +110,11 @@ void    ls_print(DIR *dir, t_ls *sp, t_ls_flags *fp, int x)
         check_error(sp->p_dir[x]);
     else if (sp->ls_dir > 1)
     {
-        ft_putendl(sp->p_dir[x]);
-        ls_basic(sp->p_dir[x], fp, -1);
         printf("%s\n", sp->p_dir[x]);
+        ls_basic(sp->p_dir[x], fp, -1);
     }
     else {
+        printf("%s\n", "here");
         ls_basic(sp->p_dir[x], fp, -1);
     }
     printf("long = %d\n", fp->l_long);
