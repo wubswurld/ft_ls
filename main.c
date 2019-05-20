@@ -114,7 +114,6 @@ void    ls_print(DIR *dir, t_ls *sp, t_ls_flags *fp, int x)
         ls_basic(sp->p_dir[x], fp, -1);
     }
     else {
-        printf("%s\n", "here");
         ls_basic(sp->p_dir[x], fp, -1);
     }
     printf("long = %d\n", fp->l_long);
