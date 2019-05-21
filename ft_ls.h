@@ -45,5 +45,6 @@ void    check_error(char *str);
 //directory
 int     count_dir(char **av);
 char    **get_dir(char **av, int *dir);
+char	*createpath(char *path, char *new_path)
 
 # endif
