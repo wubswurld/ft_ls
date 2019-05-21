@@ -2,15 +2,14 @@
 # define FT_PRINTF_H
 
 # include <sys/types.h>
-# include <sys/stat.h>
-# include <dirent.h>
-# include <unistd.h>
-# include <stdlib.h>
-# include <unistd.h>
 # include <time.h>
 # include <pwd.h>
 # include <grp.h>
 # include <stdio.h>
+# include <sys/stat.h>
+# include <dirent.h>
+# include <unistd.h>
+# include <stdlib.h>
 # include <stdbool.h>
 # include "final-libft/libft.h"
 
@@ -45,6 +44,7 @@ void    check_error(char *str);
 //directory
 int     count_dir(char **av);
 char    **get_dir(char **av, int *dir);
-char	*createpath(char *path, char *new_path)
+char	*createpath(char *path, char *new_path);
+void    free_dir(t_ls_flags *fp, t_ls *sp);
 
 # endif
