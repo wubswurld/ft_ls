@@ -44,20 +44,20 @@ int		totaldirs(char **folder, t_ls_flags *fp, char *str, int ret)
 
 char	**a_order(char **ret)
 {
-	int		i;
+	int		x;
 	char	*tmp;
 
-	i = 1;
-	while (ret[i])
+	x = 1;
+	while (ret[x])
 	{
-		if (ft_strcmp(ret[i - 1], ret[i]) > 0)
+		if (ft_strcmp(ret[x - 1], ret[x]) > 0)
 		{
-			tmp = ret[i];
-			ret[i] = ret[i - 1];
-			ret[i - 1] = tmp;
-			i = 1;
+			tmp = ret[x];
+			ret[x] = ret[x - 1];
+			ret[x - 1] = tmp;
+			x = 1;
 		}
-		i++;
+		x++;
 	}
 	return (ret);
 }
@@ -67,13 +67,19 @@ char    **ls_sort(DIR *dir, t_ls_flags *fp, int x)
     struct dirent *d_stream;
     char   **ret;
 
-    while ((d_stream = readdir(dir)) != NULL)
+    while ((d_stream = readdir(dir)) != 0)
         x++;
+    // while ((d_stream = readdir(dir) != NULL))
+    //     x++;
+    printf("this is %d\n", x);
     rewinddir(dir);
     ret = (char **)malloc(sizeof(char *) * (x + 1));
     ret[x] = NULL;
     while ((d_stream = readdir(dir)) != NULL)
+    {
+        printf("%s\n", d_stream->d_name);
          ret[x++] = ft_strdup(d_stream->d_name);
+    }
     ret[x] = NULL;
     fp->r_lex != 1 && fp->t_sort != 1 ? a_order(ret) : 0;
     return (ret);
@@ -89,8 +95,8 @@ void    ls_basic(char *str, t_ls_flags *fp, int x)
     ret = 0;
     tmp = NULL;
     if (!(dir = opendir(str)))
-    return;
-    folder = ls_sort(dir, fp, x);
+        return;
+    folder = ls_sort(dir, fp, 0);
     if (fp->l_long == 1)
     {
         ft_putstr("total ");
@@ -98,13 +104,13 @@ void    ls_basic(char *str, t_ls_flags *fp, int x)
 		// ft_putendl(tmp);
 		free(tmp);
     }
+       printf("blah %d\n", x);
     // Close directory stream
     closedir(dir);
 }
 
 void    ls_print(DIR *dir, t_ls *sp, t_ls_flags *fp, int x)
 {
-    printf("lsdir = %d\n", sp->ls_dir);
     //open directory stream at path pointed to by sp->p_dir[x], by defauly it goes to the first entry in the directory
     if (!(dir = opendir(sp->p_dir[x])))
         check_error(sp->p_dir[x]);
@@ -114,9 +120,9 @@ void    ls_print(DIR *dir, t_ls *sp, t_ls_flags *fp, int x)
         ls_basic(sp->p_dir[x], fp, -1);
     }
     else {
+        printf("%s\n", sp->p_dir[x]);
         ls_basic(sp->p_dir[x], fp, -1);
     }
-    printf("long = %d\n", fp->l_long);
     closedir(dir);
 }
 
@@ -128,6 +134,7 @@ void    ft_ls(t_ls *sp)
 
     x = 0; 
     dir = NULL;
+    //assign all flags a boolean value
     fp = index_flag(sp);
     while (x < sp->ls_dir)
     {
@@ -164,15 +171,13 @@ int     main(int ac, char **av)
             exit(1);
         sp->p_dir[0][0] = '.';
         sp->p_dir[1] = NULL;
-        printf("dir = .");
+        printf("%d\n", sp->ls_dir);
     }
     else
     {
         //get flags as string
         sp->p_flags = convert_flags(av, &sp->ls_flags);
         sp->p_dir = get_dir(av, &sp->ls_dir);
-        printf("directory: %s\n", *sp->p_dir);
-        printf("flags: %s\n", sp->p_flags);
     }
     ft_ls(sp);
     return (0);
