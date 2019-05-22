@@ -2,17 +2,6 @@
 // #include "libft/libft.h"
 #include <stdio.h>
 
-char	*createpath(char *path, char *new_path)
-{
-	char	*info;
-
-	info = (char*)malloc(sizeof(char) * (strlen(path) + strlen(new_path) + 2));
-	ft_strcpy(info, path);
-	ft_strcat(info, "/");
-	ft_strcat(info, new_path);
-	return (info);
-}
-
 int		totaldirs(char **folder, t_ls_flags *fp, char *str, int ret)
 {
 	struct stat		*filestat;
@@ -67,22 +56,100 @@ char    **ls_sort(DIR *dir, t_ls_flags *fp, int x)
     struct dirent *d_stream;
     char   **ret;
 
-    while ((d_stream = readdir(dir)) != 0)
-        x++;
-    // while ((d_stream = readdir(dir) != NULL))
+    // while ((d_stream = readdir(dir)) != 0)
     //     x++;
-    printf("this is %d\n", x);
+    while ((d_stream = readdir(dir)) != NULL)
+        x++;
     rewinddir(dir);
     ret = (char **)malloc(sizeof(char *) * (x + 1));
     ret[x] = NULL;
+    x = 0;
     while ((d_stream = readdir(dir)) != NULL)
     {
-        printf("%s\n", d_stream->d_name);
-         ret[x++] = ft_strdup(d_stream->d_name);
+        // printf("%s\n", d_stream->d_name);
+         ret[x] = ft_strdup(d_stream->d_name);
+         x++;
     }
     ret[x] = NULL;
-    fp->r_lex != 1 && fp->t_sort != 1 ? a_order(ret) : 0;
+    // fp->r_lex != 1 && fp->t_sort != 1 ? a_order(ret) : 0;
+    if (fp->r_lex != 1 && fp->t_sort != 1)
+        a_order(ret);
     return (ret);
+}
+
+void	sps(char *name, t_ls_flags *flags, char *path)
+{
+	struct stat		*filestats;
+	struct passwd	*psswd;
+	struct group	*grp;
+	char			*tmp;
+
+	filestats = malloc(sizeof(struct stat));
+	lstat(path, filestats);
+	psswd = getpwuid(filestats->st_uid);
+	grp = getgrgid(psswd->pw_gid);
+	if (flags->l_long == 1)
+	{
+		print_stat(filestats);
+		tmp = ctime(&filestats->st_mtime);
+		tmp[16] = '\0';
+		if ((S_ISCHR(filestats->st_mode) || S_ISBLK(filestats->st_mode))
+			&& print_chr_blk(filestats, psswd, grp))
+			continue_chr_print(filestats, tmp, name);
+		else if (non_chr_blk(filestats, psswd, grp))
+			continue_nonchr_print(tmp, name);
+		ft_putstr("\n");
+	}
+	else
+		ft_putendl(name);
+	free(filestats);
+}
+
+// void    end_out(char *folder, t_ls_flags *fp, char *str)
+// {
+//     struct passwd   *password;
+//     struct stat     *buf;
+//     struct group    *grup;
+//     char            *gold;
+
+//     buf = malloc(sizeof(stat));
+//     // if (!(buf = malloc(sizeof(stat))))
+//     //     exit(1);
+//     lstat(str, buf);
+//     printf("here");
+//     password = getpwuid(buf->st_uid);
+//     printf("here1");
+//     grup = getgrgid(password->pw_gid);
+//     printf("here2");
+//     if (fp->l_long == 1)
+//     {
+//         print_stat(buf);
+//         //get time of last data modification
+//         gold = ctime(&buf->st_mtime);
+// 		gold[16] = '\0';
+//         if ((S_ISCHR(buf->st_mode) || S_ISBLK(buf->st_mode)) && print_chr_blk(buf, password, grup))
+// 			continue_chr_print(buf, gold, folder);
+// 		else if (non_chr_blk(buf, password, grup))
+// 			continue_nonchr_print(gold, folder);
+// 		ft_putstr("\n");
+// 	}
+// 	else
+// 		printf("%s\n", folder);
+//     free(buf);
+// }
+
+void    help_basic(t_ls_flags *fp, char *str, char **folder, char *tmp, int x)
+{
+    while (folder[++x])
+    {
+        tmp = createpath(str, folder[x]);
+        if (folder[x][0] != '.' && fp->a_hidden != 1)
+            sps(folder[x], fp, tmp);
+		if (fp->a_hidden == 1)
+            sps(folder[x], fp, tmp);
+		free(folder[x]);
+		free(tmp);
+    }
 }
 
 void    ls_basic(char *str, t_ls_flags *fp, int x)
@@ -94,17 +161,29 @@ void    ls_basic(char *str, t_ls_flags *fp, int x)
 
     ret = 0;
     tmp = NULL;
-    if (!(dir = opendir(str)))
-        return;
+    dir = opendir(str);
+    // if (!(dir = opendir(str)))
+    //     return;
     folder = ls_sort(dir, fp, 0);
+    // printf("%s\n", folder[x]);
     if (fp->l_long == 1)
     {
         ft_putstr("total ");
 		printf("%s\n", ft_itoa(totaldirs(folder, fp, str, ret)));
 		// ft_putendl(tmp);
-		free(tmp);
+		// free(tmp);
     }
-       printf("blah %d\n", x);
+    while (folder[++x])
+    {
+        tmp = createpath(str, folder[x]);
+        if (folder[x][0] != '.' && fp->a_hidden != 1)
+            sps(folder[x], fp, tmp);
+		if (fp->a_hidden == 1)
+            sps(folder[x], fp, tmp);
+        // free(folder[x]);
+	    // free(tmp);
+    }
+    // help_basic(fp, str, folder, tmp, x);
     // Close directory stream
     closedir(dir);
 }
@@ -120,7 +199,6 @@ void    ls_print(DIR *dir, t_ls *sp, t_ls_flags *fp, int x)
         ls_basic(sp->p_dir[x], fp, -1);
     }
     else {
-        printf("%s\n", sp->p_dir[x]);
         ls_basic(sp->p_dir[x], fp, -1);
     }
     closedir(dir);
@@ -147,10 +225,11 @@ void    ft_ls(t_ls *sp)
     // int y;
     // y = 0;
     // while (sp->p_dir[y])
-    //     free(sp->p_dir[y++]);
+        // free(sp->p_dir[y++]);
     // free(sp->p_dir);
     // free(sp->p_flags);
     // free(fp); 
+    free_dir(fp, sp);
 }
 
 int     main(int ac, char **av) 
@@ -171,7 +250,6 @@ int     main(int ac, char **av)
             exit(1);
         sp->p_dir[0][0] = '.';
         sp->p_dir[1] = NULL;
-        printf("%d\n", sp->ls_dir);
     }
     else
     {
