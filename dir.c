@@ -42,14 +42,9 @@ void    print_stat(struct stat *buf)
 
 int		print_chr_blk(struct stat *buf, struct passwd *password, struct group *grup)
 {
-	ft_putstr("  ");
-	ft_putnbr(buf->st_nlink);
-	ft_putstr(" ");
-	ft_putstr(password->pw_name);
-	ft_putstr("\t");
-	ft_putstr(grup->gr_name);
-	ft_putnbr(4);
-	ft_putstr(",");
+    printf("%3d ", buf->st_nlink);
+    printf("%s\t", password->pw_name);
+    printf("%s%d,", grup->gr_name, 4);
 	return (1);
 }
 
@@ -70,8 +65,9 @@ int		non_chr_blk(struct stat *buf, struct passwd *password, struct group *grup)
 		ft_putstr("   ");
 		ft_putstr(fix);
 	}
-	else
-		ft_putnbr(buf->st_size);
+	else {
+		printf("%10lld", buf->st_size);
+    }
 	free(fix);
 	return (1);
 }
@@ -87,8 +83,10 @@ void	continue_chr_print(struct stat *buf, char *tmp, char *str)
 
 void	continue_nonchr_print(char *tmp, char *str)
 {
+    // printf("\t");
 	ft_putstr("\t");
 	ft_putstr(tmp + 4);
-	ft_putstr("\t");
-	ft_putstr(str);
+	// ft_putstr("\t");
+    printf("\t%s\n", str);
+	// ft_putstr(str);
 }
