@@ -11,7 +11,7 @@ char	*createpath(char *path, char *new_path)
 	return (info);
 }
 
-void    free_dir(t_ls_flags *fp, t_ls *sp)
+void    free_dir(t_ls *sp)
 {
     int y;
     y = 0;
@@ -19,7 +19,7 @@ void    free_dir(t_ls_flags *fp, t_ls *sp)
         free(sp->p_dir[y++]);
     free(sp->p_dir);
     free(sp->p_flags);
-    free(fp); 
+    free(sp); 
 }
 
 
@@ -66,7 +66,7 @@ int		non_chr_blk(struct stat *buf, struct passwd *password, struct group *grup)
 		ft_putstr(fix);
 	}
 	else {
-		printf("%10lld", buf->st_size);
+		printf("%6lld", buf->st_size);
     }
 	free(fix);
 	return (1);
@@ -83,10 +83,7 @@ void	continue_chr_print(struct stat *buf, char *tmp, char *str)
 
 void	continue_nonchr_print(char *tmp, char *str)
 {
-    // printf("\t");
-	ft_putstr("\t");
+	ft_putstr(" ");
 	ft_putstr(tmp + 4);
-	// ft_putstr("\t");
-    printf("\t%s\n", str);
-	// ft_putstr(str);
+    ft_printf(" %s", str);
 }
