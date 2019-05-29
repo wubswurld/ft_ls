@@ -19,7 +19,8 @@ void    free_dir(t_ls *sp)
         free(sp->p_dir[y++]);
     free(sp->p_dir);
     free(sp->p_flags);
-    free(sp); 
+	free(sp->fp);
+	free(sp); 
 }
 
 
