@@ -1,79 +1,20 @@
 #include "ft_ls.h"
-// #include "libft/libft.h"
 #include <stdio.h>
-
-void	start_print(char *name, t_ls *sp, char *path)
-{
-	struct stat		*buf;
-	struct passwd	*psswd;
-	struct group	*grp;
-	char			*tmp;
-
-	if (!(buf = malloc(sizeof(struct stat))))
-        exit(1);
-	lstat(path, buf);
-	psswd = getpwuid(buf->st_uid);
-	grp = getgrgid(psswd->pw_gid);
-	if (sp->fp->l_long == 1)
-	{
-		print_stat(buf);
-		tmp = ctime(&buf->st_mtime);
-		tmp[16] = '\0';
-        //checks is st->mode is a special character or is its a block special file && prints it if it a block file
-		if ((S_ISCHR(buf->st_mode) || S_ISBLK(buf->st_mode)) && print_chr_blk(buf, psswd, grp))
-			continue_chr_print(buf, tmp, name);
-		else if (non_chr_blk(buf, psswd, grp))
-			continue_nonchr_print(tmp, name);
-	}
-	else
-		ft_printf("%s", name);
-	free(buf);
-}
-
-// void    end_out(char *folder, t_ls_flags *fp, char *str)
-// {
-//     struct passwd   *password;
-//     struct stat     *buf;
-//     struct group    *grup;
-//     char            *gold;
-
-//     buf = malloc(sizeof(stat));
-//     // if (!(buf = malloc(sizeof(stat))))
-//     //     exit(1);
-//     lstat(str, buf);
-//     printf("here");
-//     password = getpwuid(buf->st_uid);
-//     printf("here1");
-//     grup = getgrgid(password->pw_gid);
-//     printf("here2");
-//     if (fp->l_long == 1)
-//     {
-//         print_stat(buf);
-//         //get time of last data modification
-//         gold = ctime(&buf->st_mtime);
-// 		gold[16] = '\0';
-//         if ((S_ISCHR(buf->st_mode) || S_ISBLK(buf->st_mode)) && print_chr_blk(buf, password, grup))
-// 			continue_chr_print(buf, gold, folder);
-// 		else if (non_chr_blk(buf, password, grup))
-// 			continue_nonchr_print(gold, folder);
-// 		ft_putstr("\n");
-// 	}
-// 	else
-// 		printf("%s\n", folder);
-//     free(buf);
-// }
 
 void    help_basic(t_ls *sp, char *str, char **folder, char *tmp, int x)
 {
     while (folder[++x])
     {
         tmp = createpath(str, folder[x]);
+        if (tmp == NULL)
+            return ;
         if (folder[x][0] != '.' && sp->fp->a_hidden != 1)
             start_print(folder[x], sp, tmp);
 		if (sp->fp->a_hidden == 1)
             start_print(folder[x], sp, tmp);
-		// free(folder[x]);
-		// free(tmp);
+        if (folder[x])
+            free(folder[x]);
+	    free(tmp);
     }
 }
 
@@ -90,7 +31,8 @@ void    help_recur(t_ls *sp, char *str, char **folder)
             start_print(folder[x], sp, tmp);
 		if (sp->fp->a_hidden == 1)
             start_print(folder[x], sp, tmp);
-		// free(folder[x]);
+		// if (folder[x])
+            // free(folder[x]);
 		// free(tmp);
         x++;
     }
@@ -120,22 +62,6 @@ void    ls_basic(char *str, t_ls *sp, int x)
     // Close directory stream
     closedir(dir);
     free (folder);
-}
-
-void    ls_print(DIR *dir, t_ls *sp, int x)
-{
-    //open directory stream at path pointed to by sp->p_dir[x], by defauly it goes to the first entry in the directory, or aka the first directory in 2d array
-    if (!(dir = opendir(sp->p_dir[x])))
-        check_error(sp->p_dir[x]);
-    else if (sp->ls_dir > 1)
-    {
-        ft_printf("%s:\n", sp->p_dir[x]);
-        ls_basic(sp->p_dir[x], sp, -1);
-    }
-    else
-        ls_basic(sp->p_dir[x], sp, -1);
-    //send opened directory, flags and starting point to print
-    closedir(dir);
 }
 
 void	rec_perms(char **fol, char *path, t_ls *sp)
@@ -202,24 +128,10 @@ void    ft_ls(t_ls *sp)
     sp->fp = index_flag(sp);
     while (x < sp->ls_dir)
     {
-        if (sp->fp->R_recur == 1)
-        {
-            Recur_print(dir, sp, 0);
-        }
-        else
-            ls_print(dir, sp, x);
+        (sp->fp->R_recur == 1) ? Recur_print(dir, sp, 0) : ls_print(dir, sp, x);
         x++;
     }
-    // free_dir(sp);
-    // x = 0;
-    while (sp->p_dir[x])
-	{
-		free(sp->p_dir[x]);
-		x++;
-	}
-	free(sp->p_dir[x]);
-	free(sp->p_flags);
-	free(sp);
+    free_dir(sp);
 }
 
 int     main(int ac, char **av) 
