@@ -1,6 +1,6 @@
 NAME = ft_ls
 
-CFILES = main.c flags.c directory.c dir.c sort_files.c
+CFILES = main.c flags.c directory.c dir.c sort_files.c printfiles.c
 
 FLAGS = -Wall -Werror -Wextra 
 
