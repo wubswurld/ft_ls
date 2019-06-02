@@ -1,43 +1,27 @@
 #include "ft_ls.h"
 
-// int     count_flag(char **av)
-// {
-//     int x;
-//     int y;
-//     int ret;
-    
-//     x = 1;
-//     ret = 0;
-//     while (av[x])
-//     {
-//         if (av[x][0] == '-')
-//         {
-//             y = 1;
-//             while (av[x][y++])
-//                 ret++;
-//         }
-//         x++;
-//     }
-//     return (ret);
-// }
 int     count_flag(char **av)
 {
-    int x;
-    int y;
-    int ret;
-    
-    x = 1;
-    ret = 0;
-    while (av[x])
-    {
-        if (av[x][0] == '-')
-        {
-            y = 1;
-            ret = ft_strlen(&av[x][y]);
-        }
-        x++;
-    }
-    return (ret);
+    int		j;
+	int		x;
+	int		ret;
+
+	ret = 0;
+	x = 1;
+	while (av[x])
+	{
+		if (av[x][0] == '-')
+		{
+			j = 1;
+			while (av[x][j])
+			{
+				ret++;
+				j++;
+			}
+		}
+		x++;
+	}
+	return (ret);
 }
 
 char      *convert_2d(char *ret, char **av) 
@@ -65,10 +49,11 @@ char      *convert_2d(char *ret, char **av)
 char     *convert_flags(char **av, int *flags)
 {
     char        *ret;
+    //get # of flags
     *flags = count_flag(av);
-    printf("here = %d\n", *flags);
     if (!(ret = (char *)malloc(sizeof(char) * (*flags + 1))))
         exit(1);
+    //take argv and convert to 2d array
     ret = convert_2d(ret, av);
     return (ret);
 }
@@ -98,21 +83,24 @@ int     check_flags(t_ls *sp)
 t_ls_flags  *index_flag(t_ls *sp)
 {
     int x;
-    t_ls_flags      *fp;
-    
+
     x = 0;
-    if (!(fp = (t_ls_flags*)malloc(sizeof(t_ls_flags ))))
+    if (!(sp->fp = (t_ls_flags*)malloc(sizeof(t_ls_flags))))
         exit(1);
+    //iterate through 2d array of flags and assign values
     while (x < sp->ls_flags)
     {  
-        sp->p_flags[x] == 'l' ? fp->l_long = 1 : 0;
-        sp->p_flags[x] == 'R' ? fp->R_recur = 1 : 0;
-        sp->p_flags[x] == 'r' ? fp->r_lex = 1 : 0;
-        sp->p_flags[x] == 'a' ? fp->a_hidden = 1 : 0;
-        sp->p_flags[x] == 't' ? fp->t_sort = 1 : 0;
+        sp->p_flags[x] == 'l' ? sp->fp->l_long = 1 : 0;
+        sp->p_flags[x] == 'R' ? sp->fp->R_recur = 1 : 0;
+        sp->p_flags[x] == 'r' ? sp->fp->r_lex = 1 : 0;
+        sp->p_flags[x] == 'a' ? sp->fp->a_hidden = 1 : 0;
+        sp->p_flags[x] == 't' ? sp->fp->t_sort = 1 : 0;
         if (check_flags(sp) == -1)
+        {
             ft_putstr("ls: illegal option\n");
+            exit(1);
+        }
         x++;
     }
-    return (fp);
+    return (sp->fp);
 }

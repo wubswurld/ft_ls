@@ -16,6 +16,15 @@ void    ls_print(DIR *dir, t_ls *sp, int x)
     closedir(dir);
 }
 
+void    Recur_print(DIR *dir, t_ls *sp, int x)
+{
+    if (!(dir = opendir(sp->p_dir[x])))
+        check_error(sp->p_dir[x]);
+    else
+        listdir(sp->p_dir[x], sp, x);
+    closedir(dir);
+}
+
 void	start_print(char *name, t_ls *sp, char *path)
 {
 	struct stat		*buf;

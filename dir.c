@@ -1,29 +1,5 @@
 #include "ft_ls.h"
 
-char	*createpath(char *path, char *new_path)
-{
-	char	*info;
-
-	info = (char*)malloc(sizeof(char) * (strlen(path) + strlen(new_path) + 2));
-	ft_strcpy(info, path);
-	ft_strcat(info, "/");
-	ft_strcat(info, new_path);
-	return (info);
-}
-
-void    free_dir(t_ls *sp)
-{
-    int y;
-    y = 0;
-    while (sp->p_dir[y])
-        free(sp->p_dir[y++]);
-    free(sp->p_dir);
-    free(sp->p_flags);
-	free(sp->fp);
-	free(sp); 
-}
-
-
 void    print_stat(struct stat *buf)
 {
     if (S_ISLNK(buf->st_mode))

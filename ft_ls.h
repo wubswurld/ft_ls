@@ -2,14 +2,16 @@
 # define FT_PRINTF_H
 
 # include <sys/types.h>
+# include <sys/stat.h>
+# include <dirent.h>
+# include <dirent.h>
+# include <unistd.h>
+# include <stdlib.h>
+# include <unistd.h>
 # include <time.h>
 # include <pwd.h>
 # include <grp.h>
 # include <stdio.h>
-# include <sys/stat.h>
-# include <dirent.h>
-# include <unistd.h>
-# include <stdlib.h>
 # include <stdbool.h>
 # include "final-libft/libft.h"
 
@@ -38,8 +40,14 @@ void	continue_nonchr_print(char *tmp, char *str);
 void	continue_chr_print(struct stat *buf, char *tmp, char *str);
 int		non_chr_blk(struct stat *buf, struct passwd *password, struct group *grup);
 int		print_chr_blk(struct stat *buf, struct passwd *password, struct group *grup);
+void    ls_print(DIR *dir, t_ls *sp, int x);
+void	start_print(char *name, t_ls *sp, char *path);
+//basic print
+void    ls_basic(char *str, t_ls *sp, int x);
 //print permissions
 void    print_stat(struct stat *buf);
+//recursive printing
+void    Recur_print(DIR *dir, t_ls *sp, int x);
 //flags
 int     count_flag(char **av);
 //convert str into 2d array
@@ -56,10 +64,13 @@ char	**a_order(char **ret);
 char    **ls_sort(DIR *dir, t_ls *sp, int x);
 //directory
 int     count_dir(char **av);
-char    **get_dir(char **av, int *dir);
-void    free_dir(t_ls_flags *fp, t_ls *sp);
+char    **get_dir(char **av, int *ls_dirs);
 char	**store_dirs(char *argv[], int *dirs);
 // int		ls_directory(char **folder, t_ls_flags *fp, char *str, int ret);
 int		ls_directory(char **folder, t_ls *sp, char *str, int ret);
-
+void	rec_perms(char **fol, char *path, t_ls *sp);
+void    listdir(char *str, t_ls *sp, int x);
+// free files
+void    free_folder(char **folder, int x);
+void    free_dir(t_ls *sp);
 # endif

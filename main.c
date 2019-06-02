@@ -12,9 +12,6 @@ void    help_basic(t_ls *sp, char *str, char **folder, char *tmp, int x)
             start_print(folder[x], sp, tmp);
 		if (sp->fp->a_hidden == 1)
             start_print(folder[x], sp, tmp);
-        if (folder[x])
-            free(folder[x]);
-	    free(tmp);
     }
 }
 
@@ -29,12 +26,10 @@ void    help_recur(t_ls *sp, char *str, char **folder)
         tmp = createpath(str, folder[x]);
         if (folder[x][0] != '.' && sp->fp->a_hidden != 1)
             start_print(folder[x], sp, tmp);
-		if (sp->fp->a_hidden == 1)
+		if (sp->fp->a_hidden == 1 && folder[x][0] != '.')
             start_print(folder[x], sp, tmp);
-		// if (folder[x])
-            // free(folder[x]);
-		// free(tmp);
         x++;
+        free(tmp);
     }
 }
 
@@ -75,12 +70,12 @@ void	rec_perms(char **fol, char *path, t_ls *sp)
 	while (fol[i])
 	{
 		tmp = createpath(path, fol[i]);
-		if (fol[i][0] != '.' && sp->fp->a_hidden != 1)
+		if (fol[i] && fol[i][0] != '.' && sp->fp->a_hidden != 1)
 			listdir(tmp, sp, 0);
 		else if (strcmp(fol[i], ".") != 0 && strcmp(fol[i], "..") != 0 && sp->fp->a_hidden == 1)
 			listdir(tmp, sp, 0);
 		i++;
-        // free(tmp);
+        free(tmp);
 	}
 }
 
@@ -88,33 +83,28 @@ void listdir(char *str, t_ls *sp, int x)
 {
     DIR *dir;
     char **folder;
-    char *tmp;
+    // char *tmp;
+    char *extra;
 
     if (!(dir = opendir(str)))
         return ;
-    ft_printf("\n%s", str);
+    ft_putchar('\n');
+    ft_putstr(str);
+    ft_putchar('\n');
+    // ft_printf("%s", str);
     folder = ls_sort(dir, sp, 0);
     if (sp->fp->l_long == 1 && sp->p_dir[x])
     {
-        tmp = ft_itoa(ls_directory(folder, sp, str, 0));
-        ft_printf("total %s", tmp);
-	    free(tmp);
+        extra = ft_itoa(ls_directory(folder, sp, str, 0));
+        ft_printf("total %s", extra);
+	    free(extra);
     }
     help_recur(sp, str, folder);
     closedir(dir);
-    if (!(dir = opendir(sp->p_dir[x])))
-        check_error(sp->p_dir[x]);
+    (!(dir = opendir(sp->p_dir[x]))) ? check_error(sp->p_dir[x]) : 0;
     rec_perms(folder, str, sp);
     closedir(dir);
-}
-
-void    Recur_print(DIR *dir, t_ls *sp, int x)
-{
-    if (!(dir = opendir(sp->p_dir[x])))
-        check_error(sp->p_dir[x]);
-    else
-        listdir(sp->p_dir[x], sp, x);
-    closedir(dir);
+    free_folder(folder, 0);
 }
 
 void    ft_ls(t_ls *sp)
@@ -162,6 +152,5 @@ int     main(int ac, char **av)
         sp->p_dir = get_dir(av, &sp->ls_dir);
     }
     ft_ls(sp);
-    // free(sp);
     return (0);
 }

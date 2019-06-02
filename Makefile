@@ -1,10 +1,10 @@
 NAME = ft_ls
 
-CFILES = main.c flags.c directory.c dir.c sort_files.c printfiles.c
+CFILES = main.c flags.c directory.c dir.c sort_files.c printfiles.c freefiles.c extra.c
 
 FLAGS = -Wall -Werror -Wextra 
 
-GCC = gcc
+GCC = gcc -g -fsanitize=address
 
 LIBFT = final-libft
 

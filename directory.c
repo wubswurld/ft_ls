@@ -4,6 +4,7 @@ void    check_error(char *str)
 {
     printf("ls: ");
     printf("%s: ", str);
+	// ft_putstr(str);
     printf("No such file or directory\n");
     exit(1);
 }
@@ -46,7 +47,7 @@ char    **get_dir(char **av, int *ls_dirs)
     //put directories into 2d array
     while (av[x])
     {
-		if(av[x][0] != '-')
+		if (av[x][0] != '-')
 			ret[j++] = ft_strdup(av[x]);
         x++;
     }
@@ -78,6 +79,8 @@ int		ls_directory(char **folder, t_ls *sp, char *str, int ret)
 			free(tmp);
 			ret += buf->st_blocks;
 		}
+		else if (sp->fp->l_long == 1 && sp->fp->a_hidden == 1)
+			free(tmp);
 	}
 	free(buf);
 	return (ret);
