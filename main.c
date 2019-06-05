@@ -26,7 +26,7 @@ void    help_recur(t_ls *sp, char *str, char **folder)
         tmp = createpath(str, folder[x]);
         if (folder[x][0] != '.' && sp->fp->a_hidden != 1)
             start_print(folder[x], sp, tmp);
-		if (sp->fp->a_hidden == 1 && folder[x][0] != '.')
+		if (sp->fp->a_hidden == 1)
             start_print(folder[x], sp, tmp);
         x++;
         free(tmp);
@@ -56,7 +56,7 @@ void    ls_basic(char *str, t_ls *sp, int x)
     help_basic(sp, str, folder, tmp, x);
     // Close directory stream
     closedir(dir);
-    free (folder);
+    free(folder);
 }
 
 void	rec_perms(char **fol, char *path, t_ls *sp)
@@ -83,15 +83,11 @@ void listdir(char *str, t_ls *sp, int x)
 {
     DIR *dir;
     char **folder;
-    // char *tmp;
     char *extra;
 
     if (!(dir = opendir(str)))
         return ;
-    ft_putchar('\n');
-    ft_putstr(str);
-    ft_putchar('\n');
-    // ft_printf("%s", str);
+    ft_printf("\n%s", str);
     folder = ls_sort(dir, sp, 0);
     if (sp->fp->l_long == 1 && sp->p_dir[x])
     {

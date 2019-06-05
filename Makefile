@@ -4,7 +4,7 @@ CFILES = main.c flags.c directory.c dir.c sort_files.c printfiles.c freefiles.c 
 
 FLAGS = -Wall -Werror -Wextra 
 
-GCC = gcc -g -fsanitize=address
+GCC = gcc
 
 LIBFT = final-libft
 

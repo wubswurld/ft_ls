@@ -73,4 +73,5 @@ void    listdir(char *str, t_ls *sp, int x);
 // free files
 void    free_folder(char **folder, int x);
 void    free_dir(t_ls *sp);
+void	sps(char *name, t_ls *sp, char *path);
 # endif
